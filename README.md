@@ -1,12 +1,10 @@
-# E-Commerce RAG Chatbot API
+# E-Commerce RAG Chatbot API & Evaluation Suite
 
-A Retrieval-Augmented Generation (RAG) Chatbot API built with **Python**, **FastAPI**, **LangChain**, **FAISS**, and **Google Gemini AI**. The application processes an e-commerce knowledge base, indexes policy documents using vector embeddings, and provides accurate context-constrained answers via REST API endpoints.
+A Retrieval-Augmented Generation (RAG) Chatbot API and evaluation framework built with **Python**, **FastAPI**, **LangChain**, **FAISS**, and **Google Gemini AI**. The application indexes an e-commerce knowledge base, provides context-constrained API responses, and includes a full evaluation suite with dataset quality auditing and RAG performance scoring.
 
 ---
 
 ## 🌟 Architecture & Walkthrough
-
-The application follows a standard RAG workflow:
 
 ```text
 ┌─────────────────┐       ┌──────────────────────────┐       ┌──────────────────────┐
@@ -18,37 +16,39 @@ The application follows a standard RAG workflow:
 │  FastAPI /ask   │ ◄───► │  FAISS Vector Search     │ ◄───► │  IndexFlatL2 Vector  │
 │  Gemini Flash   │       │  Top 3 Chunks Retrieval  │       │  Store Persistence   │
 └─────────────────┘       └──────────────────────────┘       └──────────────────────┘
+        │
+        ▼
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│  Evaluation & Quality Assurance Suite                                            │
+│  - golden_dataset.json: Ground-truth Q&A test cases                              │
+│  - dataset_quality_checker.py: Audit dataset duplicates, blanks & score (>=95%)  │
+│  - evaluate_rag.py: Measure Faithfulness & Answer Correctness RAG metrics        │
+└──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Core Components
+### Core Repository Files
 
-- **`knowledge.txt`**: E-commerce policy document covering Return & Refund policies, Shipping & Delivery options, Order Tracking & Cancellations, Warranty & Repairs, Payment Methods, and Support channels.
-- **`rag_pipeline.py`**:
-  - Loads and splits `knowledge.txt` using `RecursiveCharacterTextSplitter` with configurable `CHUNK_SIZE` and `CHUNK_OVERLAP`.
-  - Generates embeddings via Google Gemini (`models/embedding-001`) with automatic local fallback for offline development.
-  - Builds and persists a FAISS `IndexFlatL2` vector index in `data/faiss/index.faiss` and `data/faiss/chunks.txt`.
-  - Performs similarity searches to retrieve the top 3 relevant chunks for any question.
-- **`main.py`**:
-  - FastAPI application exposing REST endpoints.
-  - Formulates a strict system prompt instructing `gemini-2.5-flash` to answer **only** using retrieved context.
-  - Responds with `"I don't have enough information to answer that question."` when context is insufficient.
-- **`test_api.py`**: Automated test suite utilizing FastAPI's `TestClient` for unit and integration testing.
+- **`knowledge.txt`**: E-commerce customer support documentation (Return window, shipping fees, warranty terms, support contact).
+- **`rag_pipeline.py`**: Reads knowledge base, splits text using `RecursiveCharacterTextSplitter` (`CHUNK_SIZE`, `CHUNK_OVERLAP` from `.env`), generates vector embeddings, creates/persists FAISS `IndexFlatL2` index in `data/faiss/`, and performs similarity searches.
+- **`main.py`**: FastAPI application exposing `GET /` and `POST /ask`. Enforces strict context prompting for `gemini-1.5-flash` to prevent hallucinations.
+- **`golden_dataset.json`**: Ground-truth benchmark dataset formatted with `question` and `expected_answer` pairs (in-scope policies and out-of-scope queries).
+- **`dataset_quality_checker.py`**: Audits dataset quality (exact & near duplicates, missing fields, minimum length constraints) and computes a percentage quality score (requires $\ge 95\%$ for Golden Dataset status).
+- **`evaluate_rag.py`**: Evaluates RAG metrics (**Faithfulness** and **Answer Correctness**) across all questions in `golden_dataset.json` and outputs `evaluation_results.json`.
+- **`test_api.py`**: FastAPI `TestClient` integration test suite.
 
 ---
 
 ## 📋 Prerequisites
 
-Before running the application, ensure you have:
-
-- **Python 3.9+** installed (`python --version`)
+- **Python 3.9+** (`python --version`)
 - **pip** package manager
-- **Google Gemini API Key** (Get one from [Google AI Studio](https://aistudio.google.com/))
+- **Google Gemini API Key** (Obtain from [Google AI Studio](https://aistudio.google.com/))
 
 ---
 
 ## ⚙️ Environment Configuration
 
-Create or update the `.env` file in the root directory:
+Create or update your `.env` file in the root directory:
 
 ```env
 GOOGLE_API_KEY=your_actual_gemini_api_key
@@ -56,51 +56,52 @@ CHUNK_SIZE=500
 CHUNK_OVERLAP=100
 ```
 
-*Note: An [.env.example](file:///d:/Lakshmi/Agentic-AI/E-CommerceChatBot/.env.example) template is provided in the repository.*
+*An [.env.example](file:///d:/Lakshmi/Agentic-AI/E-CommerceChatBot/.env.example) template is provided in the root directory.*
 
 ---
 
-## 🚀 Setup & Execution Instructions
+## 🚀 Setup & Execution Guide
 
 ### 1. Install Dependencies
-
-Install all required Python packages using `requirements.txt`:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Build the FAISS Vector Index
-
-Run `rag_pipeline.py` to process `knowledge.txt`, generate vector embeddings, create the FAISS index, and execute a standalone test query:
+### 2. Build FAISS Vector Index & Standalone Test
 
 ```bash
 python rag_pipeline.py
 ```
+*Generated files: `data/faiss/index.faiss` and `data/faiss/chunks.txt`.*
 
-*Output files generated:*
-- `data/faiss/index.faiss` (FAISS vector store)
-- `data/faiss/chunks.txt` (JSON-encoded text chunks)
+### 3. Verify Golden Dataset Quality (Quality Auditor)
 
-### 3. Start the FastAPI Application Server
+Audit `golden_dataset.json` for duplicates, blanks, and quality score ($\ge 95\%$ required):
 
-Launch the web server using `uvicorn`:
+```bash
+python dataset_quality_checker.py golden_dataset.json
+```
+
+### 4. Evaluate RAG Metrics (Faithfulness & Correctness)
+
+Pass dataset questions through the RAG pipeline and measure performance metrics:
+
+```bash
+python evaluate_rag.py
+```
+*Generated report: `evaluation_results.json`.*
+
+### 5. Run API Server
 
 ```bash
 uvicorn main:app --reload --port 8000
 ```
-
-The server will start at `http://localhost:8000`.
-
-### 4. Interactive API Documentation (Swagger UI)
-
-Access the interactive API documentation by opening your browser at:
-- **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **API Base URL**: `http://localhost:8000`
+- **Interactive Swagger Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
 - **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
-### 5. Execute Automated Test Suite
-
-Run the integration tests to verify all endpoints and strict fallback logic:
+### 6. Run API Test Suite
 
 ```bash
 python test_api.py
@@ -108,26 +109,9 @@ python test_api.py
 
 ---
 
-## 📡 API Endpoint Reference
-
-### `GET /`
-Health check and endpoint overview.
-
-**Response:**
-```json
-{
-  "status": "online",
-  "message": "Welcome to the E-Commerce RAG Chatbot API!",
-  "endpoints": {
-    "POST /ask": "Submit customer question to receive RAG-generated answer"
-  }
-}
-```
-
----
+## 📡 API Reference & Examples
 
 ### `POST /ask`
-Submit a question to retrieve relevant context and generate a RAG-backed response.
 
 **Request Body:**
 ```json
@@ -158,9 +142,7 @@ Submit a question to retrieve relevant context and generate a RAG-backed respons
 }
 ```
 
----
-
-## 🧪 Example cURL Request
+### cURL Command
 
 ```bash
 curl -X POST "http://localhost:8000/ask" \
