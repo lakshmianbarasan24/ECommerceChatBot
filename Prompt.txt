@@ -1,0 +1,70 @@
+Create a simple E-Commerce RAG chatbot API using Python.
+Create these files:
+main.py
+rag_pipeline.py 
+knowledge.txt
+.env
+requirements.txt
+Use:
+FastAPI for the API
+Gemini models/gemini- embedding-001 for embeddings Gemini gemini-2.5-flash for generating answers
+FAISS for vector search
+RecursiveCharacterTextSplitter for chunking
+python-dotenv for the API key
+
+rag_pipeline.py
+Implement a RAGPipeline class that: 
+Reads knowledge.txt
+Splits it using RecursiveCharacterTextSplitter
+Uses Gemini embeddings to embed the chunks
+Creates a FAISS IndexFlatL2 index
+Saves the index to data/faiss/index.faiss
+Saves chunks to data/faiss/chunks.txt
+Loads an existing FAISS index 
+Searches the top 3 relevant chunks for a question
+Use:
+chunk_size = 500
+chunk_overlap = 100
+top_k = 3
+Also include a test section that builds
+the index and searches:
+How long do I have to return a product?
+main.py
+Create a FastAPI application with:
+GET /
+POST /ask
+The /ask endpoint should:
+Receive a customer question 
+Search FAISS using the RAG pipeline
+Get the top 3 relevant chunks 
+Send the question and retrieved context to Gemini gemini-2.5- flash
+Generate the final answer
+Return:
+{
+"question": "...",
+"answer": "...",
+"retrieved_context":[...]
+}
+The Gemini prompt must tell the model to answer only from the retrieved context and say:
+I don't have enough
+information to answer that question.
+when the answer is not available in the
+context.
+.env
+Use:
+GOOGLE_API_KEY=your_api_key
+requirements.txt
+Include all packages required for this
+project, including:
+fastapi
+uvicorn
+python-dotenv
+faiss-cpu
+numpy
+langchain
+langchain-community
+langchain-text-splitters
+langchain-google-genai
+google-genai
+requests
+Generate the complete code for all files and make it directly runnable.
