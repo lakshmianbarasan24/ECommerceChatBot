@@ -38,7 +38,7 @@ class RAGPipeline:
         index_dir: str = "data/faiss",
         chunk_size: int | None = None,
         chunk_overlap: int | None = None,
-        embedding_model: str = "models/embedding-001"
+        embedding_model: str = "models/text-embedding-004"
     ):
         self.knowledge_path = knowledge_path
         self.index_dir = index_dir
