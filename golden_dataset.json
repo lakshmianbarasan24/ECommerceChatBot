@@ -1,0 +1,50 @@
+[
+  {
+    "question": "How long do I have to return a product?",
+    "expected_answer": "Customers have up to 30 days from the delivery date to return any item purchased from our online store."
+  },
+  {
+    "question": "What items are non-returnable?",
+    "expected_answer": "Perishable goods, gift cards, downloadable software products, and intimate/sanitary goods are non-returnable."
+  },
+  {
+    "question": "How much is return shipping for an order under $50?",
+    "expected_answer": "For orders under $50, a flat return shipping fee of $4.99 will be deducted from your refund. Return shipping is free for orders above $50."
+  },
+  {
+    "question": "How long does a refund take to process?",
+    "expected_answer": "Once the returned item is received and inspected at our warehouse, refunds are processed within 5 to 7 business days back to the original payment method."
+  },
+  {
+    "question": "What are the standard shipping costs and delivery times?",
+    "expected_answer": "Standard shipping costs $5.99 (or FREE on orders over $50) and delivery takes 3 to 5 business days across the continental US."
+  },
+  {
+    "question": "How much does express shipping cost and how fast is it?",
+    "expected_answer": "Express shipping costs $14.99 and delivery takes 1 to 2 business days."
+  },
+  {
+    "question": "Within what timeframe can I cancel my order?",
+    "expected_answer": "Orders can be canceled within 2 hours of placement directly from your account dashboard."
+  },
+  {
+    "question": "What is covered under the standard warranty?",
+    "expected_answer": "All electronic items and appliances come with a 1-year limited warranty covering manufacturing defects, hardware failures, and component issues under normal usage."
+  },
+  {
+    "question": "What payment methods do you accept?",
+    "expected_answer": "We accept Visa, MasterCard, American Express, Discover, PayPal, Apple Pay, Google Pay, and store gift cards."
+  },
+  {
+    "question": "How can I contact customer support by email?",
+    "expected_answer": "You can email customer support at support@ecommercestore.com. Inquiries are responded to within 24 hours."
+  },
+  {
+    "question": "What is the capital of France?",
+    "expected_answer": "I don't have enough information to answer that question."
+  },
+  {
+    "question": "What is the policy for physical store locations?",
+    "expected_answer": "I don't have enough information to answer that question."
+  }
+]
